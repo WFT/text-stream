@@ -1,11 +1,16 @@
-(ns text-stream.model)
+(ns text-stream.edits-model)
 
-(defn realize
-  "Takes a list of edits and composes them into a string."
+(defn perform)
+
+(defn consolidate
+  "Takes a seq of edits and composes them into a single function.
+   Applies from front to back of edits seq."
   [edits]
   (apply comp edits))
 
 (defn move-cursor
+  "Edit moves the cursor to a particular position.
+"
   [position-index]
   (fn [source-map]
     (assoc-in source-map [:pos] position-index)))
