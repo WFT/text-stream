@@ -4,7 +4,10 @@
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [compojure "1.3.1"]
-                 [ring/ring-defaults "0.1.2"]]
+                 [ring/ring-defaults "0.1.2"]
+                 [aleph "0.4.0"]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [manifold "0.1.0"]]
   :plugins [[lein-ring "0.8.13"]]
   :ring {:handler text-stream.handler/app}
   :profiles
