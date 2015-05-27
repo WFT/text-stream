@@ -8,8 +8,6 @@
                  [aleph "0.4.0"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  [manifold "0.1.0"]]
-  :plugins [[lein-ring "0.8.13"]]
-  :ring {:handler text-stream.handler/app}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]]}})
