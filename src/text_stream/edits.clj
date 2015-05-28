@@ -74,7 +74,7 @@
 (def cmd-validators
   "Functions which convert a string to fit type expected by command,
   or, if not possible, return `nil`."
-  (let [parse-int #(try (Integer/parseInt %)
+  (let [parse-int #(try (Integer/parseInt (clojure.string/trim %))
                        (catch NumberFormatException _ nil))]
     {;; inited requires a different function, as it is only valid as the
      ;; first message in a stream
@@ -82,10 +82,10 @@
      insert (fn [in _] (and (string? in) in))
      delete (fn [in source-map]
               (if-let [n (parse-int in)]
-                (and (<= (:pos source-map) n) n)))
+                (and (<= n (:pos source-map)) n)))
      cursor (fn [in source-map]
               (if-let [n (parse-int in)]
-                (and (<= (count (:text source-map))) n)))}))
+                (and (<= n (count (:text source-map))) n)))}))
 
 (defn valid-command?
   "Is this a valid command? Returns the command string."
@@ -100,7 +100,7 @@
   [text source-map]
   (if-let [cmd (valid-command? text)]
     (let [func (get commands cmd)
-          text-input (subs text cmd-len)]
+          text-input (subs text (inc cmd-len))]
       (if-let [valid-input ((get cmd-validators func)
                             text-input source-map)]
         ((func valid-input) source-map)))))
