@@ -6,8 +6,8 @@
                  [compojure "1.3.1"]
                  [ring/ring-defaults "0.1.2"]
                  [aleph "0.4.0"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [manifold "0.1.0"]]
+                 [manifold "0.1.0"]
+                 [hiccup "1.0.5"]]
   :main text-stream.handler
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

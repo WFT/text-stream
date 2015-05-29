@@ -2,16 +2,20 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [text-stream.edits :as edits]
+            [text-stream.templates :as templates]
             [aleph.http :as http]
             [manifold.stream :as s]
             [manifold.deferred :as d]
             [manifold.bus :as bus]
-            [clojure.core.async :as async]))
+            [hiccup.page :as page]))
 
 (def invalid-response
   {:status 400
    :headers {"Content-Type" "text/plain"}
-   :body "<h1>400</h1> This isn't what I wanted!"})
+   :body (page/html5
+          [:body
+           [:h1 "400"]
+           "Oh no! This isn't what I expected!"])})
 
 ;;; The following is *very bad* *placeholder* code, to be replaced with an
 ;;; actual database ASAP.
@@ -97,10 +101,13 @@
                       invalid-response))
                   (catch NumberFormatException _ invalid-response)))
            (GET "/new" req (new-stream-handler req)))
-  (GET "/" [] "Home sweet home")
+  (GET "/s/:stream-id" [stream-id]
+       (templates/response-default
+        (templates/view-stream stream-id)))
+  (GET "/" [] templates/home)
   (route/not-found "Not Found"))
 
 (defn -main [& args]
   (let [port (Integer/parseInt (or (first args) "8080"))]
     (println "Starting server on port" port)
-    (http/start-server app-routes {:port port})))
+    (http/start-server #'app-routes {:port port})))

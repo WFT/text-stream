@@ -1,0 +1,47 @@
+(ns text-stream.templates
+  (:require [hiccup.core :refer :all]
+            [hiccup.page :as page]
+            [hiccup.element :refer :all]
+            [clojure.java.io :as io]))
+
+(defn response-default
+  ([body] (response-default body {}))
+  ([body options]
+   (merge {:headers {"Content-Type" "text/html"}
+           :status 200
+           :body body} options)))
+
+(defn resource-text
+  [directory]
+  (comp
+   slurp
+   io/file
+   io/resource
+   (partial str directory "/")))
+
+(def js-resource (comp javascript-tag (resource-text "js")))
+(defn css-resource
+  [css]
+  [:style
+   ((resource-text "css") css)])
+
+(defn view-stream
+  [sid]
+  (page/html5
+   [:head
+    (javascript-tag (str "var sid = " sid ";"))
+    (css-resource "view-stream.css")
+    [:title "Viewing Stream"]]
+   [:body
+    [:h1 "Viewing Stream..."]
+    [:pre#stream
+     [:span.cursor "|"]]
+    (js-resource "view-stream.js")]))
+
+(def home
+  (page/html5
+   [:head [:title "text-stream"]]
+   [:body
+    [:h1 "text-stream"]
+    [:ol
+     [:li [:a {:href "/s"} "view"]]]]))
