@@ -31,7 +31,7 @@
    [:head
     (javascript-tag (str "var sid = " sid ";"))
     (css-resource "view-stream.css")
-    [:title (str "Viewing Stream" sid)]]
+    [:title (str "Viewing Stream " sid)]]
    [:body
     [:h1 "Viewing Stream..."]
     [:pre#stream
@@ -54,9 +54,7 @@
   (page/html5
    [:head [:title "text-stream"]]
    [:body
-    [:h1 "text-stream"]
-    [:ol
-     [:li [:a {:href "/s"} "view"]]]]))
+    [:h1 "text-stream"]]))
 
 (defn invalid-response
   [reason]

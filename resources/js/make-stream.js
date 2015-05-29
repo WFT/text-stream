@@ -54,13 +54,16 @@ function attachToElementAsEditor(el) {
         var p = parseInt(e.data.substring(7));
         if (e.data.substring(0, 6) == "cnnect" && p) {
             console.log('stream: ' + p);
+            var share = document.getElementById("share");
+            share.href = "/s/" + p;
+            share.innerText = "Share this stream!";
         }
     };
     function sendMessages() {
         for(var i = 0; i < sendQueue.length; i++) {
             sock.send(sendQueue.shift());
         }
-        window.setInterval(sendMessages, 200);
+        window.setInterval(sendMessages, 1000);
     }
     sock.onopen = function(e) {
         sendMessages();
@@ -112,8 +115,8 @@ function attachToElementAsEditor(el) {
         var charCode = e.which || e.keyCode;
         var c = String.fromCharCode(charCode);
         insertT(c, sourceMap);
-        queueMessage("insert", c);
         drawInElement(el, sourceMap);
+        queueMessage("insert", c);
     });
 }
 
