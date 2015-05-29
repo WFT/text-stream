@@ -16,7 +16,9 @@
   "Returns the stream with `stream-id`."
   (and
    (< stream-id (count @streams))
-   (nth @streams stream-id)))
+   (let [stream (nth @streams stream-id)]
+     (and (not (:private stream))
+          stream))))
 
 (defn add-stream [text]
   "Adds a stream with the `text` and returns its `stream-id`."
@@ -56,10 +58,14 @@
                                         (str "cursor:"
                                              (:pos s)))
 
-                                ;; Feed messages to clients
-                                (s/connect
-                                 (bus/subscribe streamrooms stream-id)
-                                 conn)))))))
+                                (if (:closed s)
+                                  ;; Make sure we're not closed...
+                                  (s/close! conn)
+                                  
+                                  ;; Feed messages to clients
+                                  (s/connect
+                                   (bus/subscribe streamrooms stream-id)
+                                   conn))))))))
 
 (defn new-stream-handler [request]
   (d/let-flow [conn (d/catch
@@ -88,11 +94,16 @@
                             (dosync
                              (alter streams assoc sid new-map)))))
                       conn)
-                     (s/on-closed conn
+                     (s/on-closed
+                      conn
                       (fn []
-                        (bus/publish! streamrooms sid "nooope!")
+                        (dosync
+                         (alter streams assoc sid
+                                (assoc (find-stream sid) :closed true)))
                         (doall
                          (map #(.close %)
+                              ;; You don't have to go home, but you
+                              ;; can't stay here...
                               (bus/downstream streamrooms sid)))))))))))
 
 ;; TODO: write macro to simplify /<>/:stream-id
