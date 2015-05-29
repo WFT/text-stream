@@ -1,4 +1,3 @@
-
 function relativeURIWithPath(path) {
     var loc = window.location, new_uri;
     if (loc.protocol === "https:") {

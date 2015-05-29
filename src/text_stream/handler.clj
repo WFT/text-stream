@@ -42,6 +42,7 @@
 
                 (d/let-flow [ready (s/take! conn)]
                             ;; First message must be "go"
+                            ;; (trim is to allow debug via wssh)
                             (if-not (= (clojure.string/trim ready) "go")
                               (do
                                 (s/close! conn)
@@ -144,6 +145,7 @@
          (catch NumberFormatException _
                     (templates/invalid-response
                      "This stream doesn't exist!"))))
+  (GET "/new" [] (templates/new-stream))
   (GET "/" [] templates/home)
   (route/not-found "Not Found"))
 

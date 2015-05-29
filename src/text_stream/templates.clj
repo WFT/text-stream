@@ -31,12 +31,24 @@
    [:head
     (javascript-tag (str "var sid = " sid ";"))
     (css-resource "view-stream.css")
-    [:title "Viewing Stream"]]
+    [:title (str "Viewing Stream" sid)]]
    [:body
     [:h1 "Viewing Stream..."]
     [:pre#stream
      [:span.cursor "|"]]
     (js-resource "view-stream.js")]))
+
+(defn new-stream []
+  (page/html5
+   [:head
+    (css-resource "view-stream.css")
+    [:title "Streaming..."]]
+   [:body
+    [:h1 "Streaming..."]
+    [:pre#stream
+     [:span.cursor ""]]
+    [:a#share]
+    (js-resource "make-stream.js")]))
 
 (def home
   (page/html5
