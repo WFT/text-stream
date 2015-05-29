@@ -46,38 +46,9 @@ function attachToElementAsEditor(el) {
     };
     var sock = new WebSocket(relativeURIWithPath("/api/new"));
     var sendQueue = ["inited:"+sourceMap.text];
-    var lock = 0;
     function queueMessage(cmd, arg) {
-        lock++;
-        var i = sendQueue.length - 1;
-        if (i < 0) {
-            sendQueue.push(cmd + ":" + arg);
-            lock--;
-            return;
-        }
-        var lastMessage = sendQueue[i];
-        var lastCmd = lastMessage.substring(0, cmdLen);
-        if (lastCmd == cmd) {
-            var lastArg = lastMessage.substring(cmdLen + 1);
-            var newCmd = cmd + ":";
-            switch (cmd) {
-            case "insert":
-                newCmd += lastArg + arg;
-                break;
-            case "delete":
-                var p = parseInt(lastArg) + arg;
-                newCmd += p;
-                break;
-            case "cursor":
-                var p = parseInt(lastArg) + arg;
-                newCmd += p;
-                break;
-            }
-            sendQueue[i] = newCmd;
-        } else {
-            sendQueue.push(cmd + ":" + arg)
-        }
-        lock--;
+        sendQueue.push(cmd + ":" + arg);
+        return;
     }
     sock.onmessage = function(e) {
         var p = parseInt(e.data.substring(7));
@@ -86,14 +57,10 @@ function attachToElementAsEditor(el) {
         }
     };
     function sendMessages() {
-        if (!lock) {
-            for(var i = 0; i < sendQueue.length; i++) {
-                sock.send(sendQueue.shift());
-            }
-            window.setInterval(sendMessages, 500);
-        } else {
-            window.setInterval(sendMessages, 300);
+        for(var i = 0; i < sendQueue.length; i++) {
+            sock.send(sendQueue.shift());
         }
+        window.setInterval(sendMessages, 200);
     }
     sock.onopen = function(e) {
         sendMessages();
