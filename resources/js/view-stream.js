@@ -26,6 +26,7 @@ function cursorP(p, sourceMap) {
     sourceMap.pos = p;
 }
 var cmdLen = 6;
+var curs = '<span class="cursor">|</span>';
 function attachToElement(el) {
     var sourceMap = {
         pos:0,
@@ -54,9 +55,12 @@ function attachToElement(el) {
         }
         el.innerHTML =
             sourceMap.text.substring(0, sourceMap.pos) +
-            '<span class="cursor">|</span>' +
+            curs +
             sourceMap.text.substring(sourceMap.pos);
     };
+    sock.onclose = function() {
+        el.innerHTML += '<h3 class="eof">END OF TRANSMISSION</h3>'        
+    }
     sock.onopen = function() {
         sock.send("go");
     };

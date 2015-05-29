@@ -45,3 +45,13 @@
     [:h1 "text-stream"]
     [:ol
      [:li [:a {:href "/s"} "view"]]]]))
+
+(defn invalid-response
+  [reason]
+  (response-default
+   (page/html5
+          [:body
+           [:h1 "400"]
+           "Oh no! This isn't what I expected... "
+           reason])
+   {:status 400}))
