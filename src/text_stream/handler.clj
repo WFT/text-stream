@@ -8,10 +8,10 @@
             [manifold.bus :as bus]
             [clojure.core.async :as async]))
 
-(def invalid-websocket-response
+(def invalid-response
   {:status 400
    :headers {"Content-Type" "text/plain"}
-   :body "<h1>400</h1> Expected websocket request."})
+   :body "<h1>400</h1> This isn't what I wanted!"})
 
 ;;; The following is *very bad* *placeholder* code, to be replaced with an
 ;;; actual database ASAP.
@@ -40,22 +40,26 @@
                         (fn [_] nil))]
               (if-not conn
                 ;; You didn't connect over ws://
-                invalid-websocket-response
+                invalid-response
 
-                (let [s (find-stream stream-id)]
-                  ;; Send existing nonsense
-                  (s/put! conn
-                          (str "insert:"
-                               (:text s)))
+                (d/let-flow [ready (s/take! conn)]
+                            (if (= ready "go")
+                              ;; First message must be "go"
+                              (let [s (find-stream stream-id)]
+                                ;; Send existing nonsense
+                                (s/put! conn
+                                        (str "insert:"
+                                             (:text s)))
 
-                  (s/put! conn
-                          (str "cursor:"
-                               (:pos s)))
+                                (s/put! conn
+                                        (str "cursor:"
+                                             (:pos s)))
 
-                  ;; Feed messages to clients
-                  (s/connect
-                   (bus/subscribe streamrooms stream-id)
-                   conn)))))
+                                ;; Feed messages to clients
+                                (s/connect
+                                 (bus/subscribe streamrooms stream-id)
+                                 conn))
+                              invalid-response)))))
 
 (defn new-stream-handler [request]
   (d/let-flow [conn (d/catch
@@ -63,7 +67,7 @@
                         (fn [_] nil))]
               (if-not conn
                 ;; You didn't connect over ws://
-                invalid-websocket-response
+                invalid-response
 
                 ;; First message should be of the form "inited:<INITIAL TEXT>"
                 (d/let-flow
@@ -90,8 +94,8 @@
                   (let [sid (Integer/parseInt stream-id)]
                     (if (find-stream sid)
                       (read-stream-handler sid request)
-                      invalid-websocket-response))
-                  (catch NumberFormatException _ invalid-websocket-response)))
+                      invalid-response))
+                  (catch NumberFormatException _ invalid-response)))
            (GET "/new" req (new-stream-handler req)))
   (GET "/" [] "Home sweet home")
   (route/not-found "Not Found"))
