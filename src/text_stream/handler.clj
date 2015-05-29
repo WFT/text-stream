@@ -40,7 +40,7 @@
 
                 (d/let-flow [ready (s/take! conn)]
                             ;; First message must be "go"
-                            (if-not (= ready "go")
+                            (if-not (= (clojure.string/trim ready) "go")
                               (do
                                 (s/close! conn)
                                 (templates/invalid-response
@@ -88,11 +88,12 @@
                             (dosync
                              (alter streams assoc sid new-map)))))
                       conn)
-                     (s/on-closed
-                      (doall
-                       (map #(.close %)
-                            (bus/downstream streamrooms sid)))
-                      conn)))))))
+                     (s/on-closed conn
+                      (fn []
+                        (bus/publish! streamrooms sid "nooope!")
+                        (doall
+                         (map #(.close %)
+                              (bus/downstream streamrooms sid)))))))))))
 
 ;; TODO: write macro to simplify /<>/:stream-id
 (defroutes app-routes
