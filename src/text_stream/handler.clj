@@ -84,8 +84,10 @@
                           (= (subs text 0 7) "inited:"))
                    (let [init-text (subs text 7)
                          sid (add-stream init-text)]
+                     
                      ;; Respond with `sid`
                      (s/put! conn (str "cnnect:" sid))
+
                      (s/consume
                       (fn [msg]
                         (let [source-map (find-stream sid)]
@@ -93,8 +95,10 @@
                                      (edits/process-text-command msg source-map)]
                             (bus/publish! streamrooms sid msg)
                             (dosync
-                             (alter streams assoc sid new-map)))))
+                             (alter streams assoc sid new-map)))
+                          (templates/response-default "PUBLISHED")))
                       conn)
+                     
                      (s/on-closed
                       conn
                       (fn []
@@ -105,7 +109,14 @@
                          (map #(.close %)
                               ;; You don't have to go home, but you
                               ;; can't stay here...
-                              (bus/downstream streamrooms sid)))))))))))
+                              (bus/downstream streamrooms sid)))
+                        (templates/response-default "CLOSED")))
+
+                     (templates/response-default
+                      "CONNECTED"))
+                   
+                   (templates/invalid-response
+                    "Request does not conform to text-stream protocol."))))))
 
 ;; TODO: write macro to simplify /<>/:stream-id
 (defroutes app-routes

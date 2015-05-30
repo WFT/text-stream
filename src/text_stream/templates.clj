@@ -2,7 +2,8 @@
   (:require [hiccup.core :refer :all]
             [hiccup.page :as page]
             [hiccup.element :refer :all]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [compojure.response :refer [Renderable render]]))
 
 (defn response-default
   ([body] (response-default body {}))
@@ -44,10 +45,10 @@
     (css-resource "view-stream.css")
     [:title "Streaming..."]]
    [:body
-    [:h1 "Streaming..."]
+    [:small#status "connecting..."]
+    [:a#share]
     [:pre#stream
      [:span.cursor ""]]
-    [:a#share]
     (js-resource "make-stream.js")]))
 
 (def home
@@ -65,3 +66,8 @@
            "Oh no! This isn't what I expected... "
            reason])
    {:status 400}))
+
+(extend-protocol Renderable
+  java.lang.Boolean
+  (render [b _] {:status 200
+                 :body (str b)}))

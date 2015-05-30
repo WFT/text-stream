@@ -53,10 +53,11 @@ function attachToElementAsEditor(el) {
     sock.onmessage = function(e) {
         var p = parseInt(e.data.substring(7));
         if (e.data.substring(0, 6) == "cnnect" && p) {
-            console.log('stream: ' + p);
             var share = document.getElementById("share");
             share.href = "/s/" + p;
             share.innerText = "Share this stream!";
+            var status = document.getElementById("status");
+            status.innerText = "stream " + p + " connected! OK";
         }
     };
     function sendMessages() {
