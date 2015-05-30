@@ -45,18 +45,17 @@
     (css-resource "view-stream.css")
     [:title "Streaming..."]]
    [:body
-    [:a#share]
-    [:br]
-    [:small#status "connecting..."]
     [:pre#stream
      [:span.cursor ""]]
+    [:a#share]
     (js-resource "make-stream.js")]))
 
 (def home
   (page/html5
    [:head [:title "text-stream"]]
    [:body
-    [:h1 "text-stream"]]))
+    [:h1 "text-stream"]
+    [:a {:href "/new"} "New Stream"]]))
 
 (defn invalid-response
   [reason]
