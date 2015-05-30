@@ -45,8 +45,9 @@
     (css-resource "view-stream.css")
     [:title "Streaming..."]]
    [:body
-    [:small#status "connecting..."]
     [:a#share]
+    [:br]
+    [:small#status "connecting..."]
     [:pre#stream
      [:span.cursor ""]]
     (js-resource "make-stream.js")]))
