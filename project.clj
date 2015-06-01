@@ -2,7 +2,8 @@
   :license {:name "MIT License"
             :url "http://opensource.org/licenses/MIT"
             :year 2015
-            :key "mit"}
+            :key "mit"
+            :author "Will Field-Thompson"}
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"

@@ -19,7 +19,7 @@ To start a web server for the application, run:
 ```
 The MIT License (MIT)
 
-Copyright (c) 2015 WFT
+Copyright (c) 2015 Will Field-Thompson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
