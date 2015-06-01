@@ -1,5 +1,5 @@
 (ns text-stream.edits
-  (:gen-class))
+  (:require [hiccup.utils :refer escape-html]))
 
 (defn consolidate
   "Takes a seq of edits and composes them into a single function. Applies from
@@ -119,5 +119,5 @@
     (let [func (get commands cmd)
           text-input (subs text (inc cmd-len))]
       (if-let [valid-input ((get cmd-validators func)
-                            (clojure.string/escape text-input) source-map)]
+                            (escape-html text-input) source-map)]
         ((func valid-input) source-map)))))
