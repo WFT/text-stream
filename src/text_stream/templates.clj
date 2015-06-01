@@ -37,6 +37,7 @@
     [:h1 "Viewing Stream..."]
     [:pre#stream
      [:span.cursor "|"]]
+    (js-resource "utils.js")
     (js-resource "view-stream.js")]))
 
 (defn new-stream []
@@ -48,6 +49,7 @@
     [:pre#stream
      [:span.cursor ""]]
     [:a#share]
+    (js-resource "utils.js")
     (js-resource "make-stream.js")]))
 
 (def home

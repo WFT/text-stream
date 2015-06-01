@@ -1,6 +1,6 @@
 .cursor {
     background: black;
-    
+    color: white;
     
     -webkit-animation-name: blinker;
     -webkit-animation-duration: 0.9s;

@@ -1,31 +1,3 @@
-function relativeURIWithPath(path) {
-    var loc = window.location, new_uri;
-    if (loc.protocol === "https:") {
-        new_uri = "wss:";
-    } else {
-        new_uri = "ws:";
-    }
-    new_uri += "//" + loc.host;
-    new_uri += path;
-    return new_uri;
-}
-function insertT(t, sourceMap) {
-    var beginText = sourceMap.text.substring(0, sourceMap.pos);
-    var endText = sourceMap.text.substring(sourceMap.pos);
-    sourceMap.text = beginText + t + endText;
-    sourceMap.pos += t.length;
-}
-function deleteN(n, sourceMap) {
-    sourceMap.pos -= n;
-    var beginText = sourceMap.text.substring(0, sourceMap.pos);
-    var endText = sourceMap.text.substring(sourceMap.pos + n);
-    sourceMap.text = beginText + endText;
-}
-function cursorP(p, sourceMap) {
-    sourceMap.pos = p;
-}
-var cmdLen = 6;
-var curs = '<span class="cursor">|</span>';
 function attachToElement(el) {
     var sourceMap = {
         pos:0,
@@ -52,10 +24,7 @@ function attachToElement(el) {
             }
             break;
         }
-        el.innerHTML =
-            sourceMap.text.substring(0, sourceMap.pos) +
-            curs +
-            sourceMap.text.substring(sourceMap.pos);
+        drawInElement(el, sourceMap);
     };
     sock.onclose = function() {
         el.innerHTML += '<h3 class="eof">END OF TRANSMISSION</h3>'        

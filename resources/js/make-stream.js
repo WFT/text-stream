@@ -1,44 +1,5 @@
 /* A very basic editor to test the capabilities of text-streaming */
 
-function relativeURIWithPath(path) {
-    var loc = window.location, new_uri;
-    if (loc.protocol === "https:") {
-        new_uri = "wss:";
-    } else {
-        new_uri = "ws:";
-    }
-    new_uri += "//" + loc.host;
-    new_uri += path;
-    return new_uri;
-}
-
-function insertT(t, sourceMap) {
-    var beginText = sourceMap.text.substring(0, sourceMap.pos);
-    var endText = sourceMap.text.substring(sourceMap.pos);
-    sourceMap.text = beginText + t + endText;
-    sourceMap.pos += t.length;
-    return "insert:"+t;
-}
-function deleteN(n, sourceMap) {
-    sourceMap.pos -= n;
-    var beginText = sourceMap.text.substring(0, sourceMap.pos);
-    var endText = sourceMap.text.substring(sourceMap.pos + n);
-    sourceMap.text = beginText + endText;
-    return "delete:"+n;
-}
-function cursorP(p, sourceMap) {
-    sourceMap.pos = p;
-    return "cursor:"+p;
-}
-
-var curs = '<span class="cursor">|</span>';
-function drawInElement(el, sourceMap) {
-    el.innerHTML =
-        sourceMap.text.substring(0, sourceMap.pos) +
-        curs +
-        sourceMap.text.substring(sourceMap.pos);
-}
-var cmdLen = 6;
 function attachToElementAsEditor(el) {
     var sourceMap = {
         pos:el.innerText.length,
@@ -100,6 +61,10 @@ function attachToElementAsEditor(el) {
     document.addEventListener("keypress", function(e) {
         var charCode = e.which || e.keyCode;
         var c = String.fromCharCode(charCode);
+        if (charCode == 13) {
+            // No carriage returns!
+            c = '\n';
+        }
         sock.send(insertT(c, sourceMap));
         drawInElement(el, sourceMap);
     });
