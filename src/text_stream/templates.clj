@@ -27,14 +27,14 @@
    ((resource-text "css") css)])
 
 (defn view-stream
-  [sid]
+  [sid title]
   (page/html5
    [:head
     (javascript-tag (str "var sid = " sid ";"))
     (css-resource "view-stream.css")
-    [:title (str "Viewing Stream " sid)]]
+    [:title (str "Viewing " title)]]
    [:body
-    [:h1 "Viewing Stream..."]
+    [:h1 title]
     [:pre#stream
      [:span.cursor "|"]]
     (js-resource "utils.js")

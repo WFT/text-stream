@@ -146,7 +146,7 @@
   (stream-id-route
    "/s/:sid" sid request
    (templates/response-default
-    (templates/view-stream sid)))
+    (templates/view-stream sid (:title (find-stream sid)))))
   
   (GET "/new" [] (templates/new-stream))
   (GET "/" []
