@@ -1,5 +1,5 @@
 (ns text-stream.edits
-  (:require [hiccup.util :refer escape-html]))
+  (:require [hiccup.util :refer [escape-html]]))
 
 (defn consolidate
   "Takes a seq of edits and composes them into a single function. Applies from

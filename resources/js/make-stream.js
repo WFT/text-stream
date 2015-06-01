@@ -10,7 +10,7 @@ function attachToElementAsEditor(el) {
 
     sock.onmessage = function(e) {
         var p = parseInt(e.data.substring(7));
-        if (e.data.substring(0, 6) == "cnnect" && p) {
+        if (e.data.substring(0, 6) == "cnnect" && p >= 0) {
             var share = document.getElementById("share");
             share.href = "/s/" + p;
             share.innerText = "Share this stream!";
@@ -77,10 +77,11 @@ function attachToElementAsEditor(el) {
         var title = prompt("Please title this stream:", "Untitled Stream");
         sock.send("titled:" + title);
 
-        /*sock.onclose = function(e) {
+        sock.onclose = function(e) {
             el.innerHTML += '<h3>CONNECTION CLOSED</h3>s';
-            document.removeEventListener()
-        };*/
+            document.removeEventListener('keypress', onKeyPress);
+            document.removeEventListener('keydown', onKeyDown);
+        };
     };
 }
 
