@@ -1,4 +1,8 @@
 (defproject text-stream "0.1.0-SNAPSHOT"
+  :license {:name "MIT License"
+            :url "http://opensource.org/licenses/MIT"
+            :year 2015
+            :key "mit"}
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
