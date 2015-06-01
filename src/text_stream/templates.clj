@@ -35,6 +35,7 @@
     [:title (str "Viewing " title)]]
    [:body
     [:h1 title]
+    [:hr]
     [:pre#stream
      [:span.cursor "|"]]
     (js-resource "utils.js")
