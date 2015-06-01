@@ -12,6 +12,11 @@ function deleteN(n, sourceMap) {
     sourceMap.text = beginText + endText;
     return "delete:"+n;
 }
+function fwdDeleteN(n, sourceMap) {
+    cursorP(sourceMap.pos + n, sourceMap);
+    deleteN(n, sourceMap);
+    return "fwddel:"+n;
+}
 function cursorP(p, sourceMap) {
     sourceMap.pos = p;
     return "cursor:"+p;

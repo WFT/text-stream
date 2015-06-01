@@ -79,7 +79,8 @@
    "insert" insert
    "delete" delete
    "cursor" cursor
-   "titled" titled})
+   "titled" titled
+   "fwddel" forward-delete})
 
 (def cmd-len "Length of commands." 6)
 
@@ -97,6 +98,10 @@
      delete (fn [in source-map]
               (if-let [n (parse-int in)]
                 (and (<= n (:pos source-map)) n)))
+
+     forward-delete (fn [in source-map]
+              (if-let [n (parse-int in)]
+                (and (< (:pos source-map) (count (:text source-map))) n)))
 
      cursor (fn [in source-map]
               (if-let [n (parse-int in)]

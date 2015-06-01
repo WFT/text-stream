@@ -26,6 +26,7 @@ function attachToElementAsEditor(el) {
         // var UP = 38; // NOT YET IMPLEMENTED
         var RIGHT = 39;
         // var DOWN = 40; // NOT YET IMPLEMENTED
+        var DELETE = 46; // AKA "Forward Delete"
         var charCode = e.which || e.keyCode;
         switch (charCode) {
         case BACKSPACE:
@@ -48,6 +49,11 @@ function attachToElementAsEditor(el) {
             if (sourceMap.pos < sourceMap.text.length) {
                 var p = sourceMap.pos + 1;
                 sock.send(cursorP(p, sourceMap));
+            }
+            break;
+        case DELETE:
+            if (sourceMap.pos < sourceMap.text.length) {
+                sock.send(fwdDeleteN(1, sourceMap));
             }
             break;
         default:

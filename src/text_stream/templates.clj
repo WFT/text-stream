@@ -46,9 +46,9 @@
     (css-resource "view-stream.css")
     [:title "Streaming..."]]
    [:body
+    [:a#share]
     [:pre#stream
      [:span.cursor ""]]
-    [:a#share]
     (js-resource "utils.js")
     (js-resource "make-stream.js")]))
 

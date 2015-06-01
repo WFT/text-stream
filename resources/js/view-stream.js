@@ -19,10 +19,15 @@ function attachToElement(el) {
             break;
         case "cursor":
             var p = parseInt(data);
-            if (p) {
+            if (p >= 0) {
                 cursorP(p, sourceMap);
             }
             break;
+        case "fwddel":
+            var n = parseInt(data);
+            if (n) {
+                fwdDeleteN(n, sourceMap);
+            }
         }
         drawInElement(el, sourceMap);
     };
