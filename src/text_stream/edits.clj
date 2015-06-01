@@ -119,5 +119,5 @@
     (let [func (get commands cmd)
           text-input (subs text (inc cmd-len))]
       (if-let [valid-input ((get cmd-validators func)
-                            text-input source-map)]
+                            (clojure.string/escape text-input) source-map)]
         ((func valid-input) source-map)))))

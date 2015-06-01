@@ -5,7 +5,9 @@ function attachToElementAsEditor(el) {
         pos:el.innerText.length,
         text:el.innerText
     };
+    
     var sock = new WebSocket(relativeURIWithPath("/api/new"));
+
     sock.onmessage = function(e) {
         var p = parseInt(e.data.substring(7));
         if (e.data.substring(0, 6) == "cnnect" && p) {
@@ -16,19 +18,14 @@ function attachToElementAsEditor(el) {
             status.innerText = "stream " + p + " connected! OK";*/
         }
     };
-    sock.onopen = function(e) {
-        sock.send("inited:" + sourceMap.text);
-        var title = prompt("Please title this stream:", "Untitled Stream");
-        sock.send("titled:" + title);
-    };
 
-    document.addEventListener("keydown", function(e) {
+    function onKeyDown(e) {
         var BACKSPACE = 8;
         var TAB = 9;
         var LEFT = 37;
-        var UP = 38; // NOT YET IMPLEMENTED
+        // var UP = 38; // NOT YET IMPLEMENTED
         var RIGHT = 39;
-        var DOWN = 40; // NOT YET IMPLEMENTED
+        // var DOWN = 40; // NOT YET IMPLEMENTED
         var charCode = e.which || e.keyCode;
         switch (charCode) {
         case BACKSPACE:
@@ -58,9 +55,11 @@ function attachToElementAsEditor(el) {
             break;
         }
         drawInElement(el, sourceMap);
-    });
+    }
+    
+    document.addEventListener("keydown", onKeyDown);
 
-    document.addEventListener("keypress", function(e) {
+    function onKeyPress(e) {
         var charCode = e.which || e.keyCode;
         var c = String.fromCharCode(charCode);
         if (charCode == 13) {
@@ -69,7 +68,20 @@ function attachToElementAsEditor(el) {
         }
         sock.send(insertT(c, sourceMap));
         drawInElement(el, sourceMap);
-    });
+    }
+    
+    document.addEventListener("keypress", onKeyPress);
+
+    sock.onopen = function(e) {
+        sock.send("inited:" + sourceMap.text);
+        var title = prompt("Please title this stream:", "Untitled Stream");
+        sock.send("titled:" + title);
+
+        /*sock.onclose = function(e) {
+            el.innerHTML += '<h3>CONNECTION CLOSED</h3>s';
+            document.removeEventListener()
+        };*/
+    };
 }
 
 attachToElementAsEditor(document.getElementById("stream"));

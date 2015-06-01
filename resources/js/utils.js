@@ -17,20 +17,16 @@ function cursorP(p, sourceMap) {
     return "cursor:"+p;
 }
 
-function curs(t) {
-    var c = t;
-    if (c == '\n' || c == '') {
-        c = ' ' + c;
-    }
-    return '<span class="cursor">' + c + '</span>'
-}
+var curs = document.createElement('span');
+curs.className = 'cursor';
 
 function drawInElement(el, sourceMap) {
     var t = sourceMap.text + ' ';
-    el.innerHTML =
-        t.substring(0, sourceMap.pos) +
-        curs(t.substring(sourceMap.pos, sourceMap.pos+1)) +
-        t.substring(sourceMap.pos+1);
+    el.innerHTML = '';
+    el.appendChild(document.createTextNode(t.substring(0, sourceMap.pos)));
+    curs.innerText = t.substring(sourceMap.pos, sourceMap.pos+1)
+    el.appendChild(curs);
+    el.appendChild(document.createTextNode(t.substring(sourceMap.pos + 1)));
 }
 
 var cmdLen = 6;
