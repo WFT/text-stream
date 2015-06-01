@@ -52,12 +52,18 @@
     (js-resource "utils.js")
     (js-resource "make-stream.js")]))
 
-(def home
+(def page-count 25)
+
+(defn home [streams page]
   (page/html5
    [:head [:title "text-stream"]]
    [:body
     [:h1 "text-stream"]
-    [:a {:href "/new"} "New Stream"]]))
+    [:a {:href "/new"} "New Stream"]
+    [:h2 "Streams"]
+    [:ul
+     (map (fn [x] [:li [:a {:href (str "/s/" (:id x))} (:title x)]])
+          (drop (* page-count page) streams))]]))
 
 (defn invalid-response
   [reason]

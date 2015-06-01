@@ -118,46 +118,38 @@
                    (templates/invalid-response
                     "Request does not conform to text-stream protocol."))))))
 
-;; TODO: write macro to simplify /<>/:stream-id
+(defmacro stream-id-route [route sid request & body]
+  `(GET ~route [~'sid :as ~'request]
+        (try
+          (let [~'sid (Integer/parseInt ~'sid)]
+            (if (find-stream ~'sid)
+              (do ~@body)
+              (templates/invalid-response
+               "This stream doesn't exist!")))
+          (catch NumberFormatException e#
+            (templates/invalid-response
+               "This stream doesn't exist!")))))
+
 (defroutes app-routes
   (context "/api" []
            ;; api routes
-           (GET "/s/:stream-id" [stream-id :as request]
-                (try
-                  (let [sid (Integer/parseInt stream-id)]
-                    (if (find-stream sid)
-                      (read-stream-handler sid request)
-                      (templates/invalid-response
-                       "This stream doesn't exist!")))
-                  (catch NumberFormatException _
-                    (templates/invalid-response
-                     "This stream doesn't exist!"))))
+           (stream-id-route
+            "/s/:sid" sid request
+            (read-stream-handler sid request))
            (GET "/new" req (new-stream-handler req)))
-  (GET "/d/s/:stream-id" [stream-id]
-       (try
-         (let [sid (Integer/parseInt stream-id)]
-           (if (find-stream sid)
-             (templates/response-default
-              (:text (find-stream sid))
-              {:content "text/plain"})
-             (templates/invalid-response
-              "This stream doesn't exist!")))
-         (catch NumberFormatException _
-                    (templates/invalid-response
-                     "This stream doesn't exist!"))))
-  (GET "/s/:stream-id" [stream-id]
-       (try
-         (let [sid (Integer/parseInt stream-id)]
-           (if (find-stream sid)
-             (templates/response-default
-              (templates/view-stream stream-id))
-             (templates/invalid-response
-              "This stream doesn't exist!")))
-         (catch NumberFormatException _
-                    (templates/invalid-response
-                     "This stream doesn't exist!"))))
+  (stream-id-route
+   "/d/s/:sid" sid request
+   (templates/response-default
+    (:text (find-stream sid))
+    {:content "text/plain"}))
+
+  (stream-id-route
+   "/s/:sid" sid request
+   (templates/response-default
+    (templates/view-stream sid)))
+  
   (GET "/new" [] (templates/new-stream))
-  (GET "/" [] templates/home)
+  (GET "/" {{page :p} :params} (templates/home @streams (or page 0)))
   (route/not-found "Not Found"))
 
 (defn -main [& args]

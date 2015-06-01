@@ -18,6 +18,8 @@ function attachToElementAsEditor(el) {
     };
     sock.onopen = function(e) {
         sock.send("inited:" + sourceMap.text);
+        var title = prompt("Please title this stream:", "Untitled Stream");
+        sock.send("titled:" + title);
     };
 
     document.addEventListener("keydown", function(e) {

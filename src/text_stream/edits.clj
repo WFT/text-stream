@@ -19,7 +19,7 @@
   in the text."
   [position-index]
   (fn [source-map]
-    (assoc-in source-map [:pos] position-index)))
+    (assoc source-map :pos position-index)))
 
 (defn insert
   "Produces an edit function which inserts `text-insertion` into the text at
@@ -33,7 +33,9 @@
                     text-insertion
                     (subs old-text cursor))
           new-position (+ cursor (count text-insertion))]
-      {:pos new-position :text new-text})))
+      (merge source-map
+             {:pos new-position
+              :text new-text}))))
 
 (defn delete
   "Produces an edit function which deletes `deletion-count` characters from
@@ -46,7 +48,15 @@
           new-text (str
                     (subs old-text 0 new-position)
                     (subs old-text cursor))]
-      {:pos new-position :text new-text})))
+      (merge source-map
+             {:pos new-position
+              :text new-text}))))
+
+(defn titled
+  "Produces a titling function which sets the title to `title`."
+  [title]
+  (fn [source-map]
+    (assoc source-map :title title)))
 
 (defn forward-delete
   "Produces an edit function which deletes `deletion-count` characters from
@@ -57,9 +67,10 @@
      %)))
 
 (defn initial-text
+  "Produces a source-map which has the initial text `text`."
   [text]
   ((insert text)
-   {:pos 0 :text ""}))
+   {:pos 0 :text "" :title ""}))
 
 (def commands
   "Note: all commands happen to be 6 characters. 
@@ -67,7 +78,8 @@
   {"inited" initial-text
    "insert" insert
    "delete" delete
-   "cursor" cursor})
+   "cursor" cursor
+   "titled" titled})
 
 (def cmd-len "Length of commands." 6)
 
@@ -79,13 +91,18 @@
     {;; inited requires a different function, as it is only valid as the
      ;; first message in a stream
      initial-text (fn [_ _] nil)
+
      insert (fn [in _] (and (string? in) in))
+
      delete (fn [in source-map]
               (if-let [n (parse-int in)]
                 (and (<= n (:pos source-map)) n)))
+
      cursor (fn [in source-map]
               (if-let [n (parse-int in)]
-                (and (<= n (count (:text source-map))) n)))}))
+                (and (<= n (count (:text source-map))) n)))
+
+     titled (fn [in _] (and (string? in) in))}))
 
 (defn valid-command?
   "Is this a valid command? Returns the command string."
