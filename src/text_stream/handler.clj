@@ -149,7 +149,8 @@
     (templates/view-stream sid)))
   
   (GET "/new" [] (templates/new-stream))
-  (GET "/" {{page :p} :params} (templates/home @streams (or page 0)))
+  (GET "/" []
+       (templates/home @streams 0))
   (route/not-found "Not Found"))
 
 (defn -main [& args]

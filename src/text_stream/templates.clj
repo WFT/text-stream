@@ -63,7 +63,8 @@
     [:h2 "Streams"]
     [:ul
      (map (fn [x] [:li [:a {:href (str "/s/" (:id x))} (:title x)]])
-          (drop (* page-count page) streams))]]))
+          ;;(take page-count (drop (* page-count page) streams))
+          streams)]]))
 
 (defn invalid-response
   [reason]
