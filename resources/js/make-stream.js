@@ -45,11 +45,6 @@ function attachToElementAsEditor(el) {
         text:el.innerText
     };
     var sock = new WebSocket(relativeURIWithPath("/api/new"));
-    var sendQueue = ["inited:"+sourceMap.text];
-    function queueMessage(cmd, arg) {
-        sendQueue.push(cmd + ":" + arg);
-        return;
-    }
     sock.onmessage = function(e) {
         var p = parseInt(e.data.substring(7));
         if (e.data.substring(0, 6) == "cnnect" && p) {
@@ -60,14 +55,8 @@ function attachToElementAsEditor(el) {
             status.innerText = "stream " + p + " connected! OK";*/
         }
     };
-    function sendMessages() {
-        for(var i = 0; i < sendQueue.length; i++) {
-            sock.send(sendQueue.shift());
-        }
-        window.setInterval(sendMessages, 1000);
-    }
     sock.onopen = function(e) {
-        sendMessages();
+        sock.send("inited:" + sourceMap.text);
     };
 
     document.addEventListener("keydown", function(e) {
@@ -82,27 +71,23 @@ function attachToElementAsEditor(el) {
         case BACKSPACE:
             e.preventDefault();
             if (sourceMap.pos > 0) {
-                deleteN(1, sourceMap);
-                queueMessage("delete", 1);
+                sock.send(deleteN(1, sourceMap));
             }
             break;
         case TAB:
             e.preventDefault();
-            insertT("\t", sourceMap);
-            queueMessage("insert", "\t");
+            sock.send(insertT("\t", sourceMap));
             break;
         case LEFT:
             if (sourceMap.pos > 0) {
                 var p = sourceMap.pos - 1;
-                cursorP(p, sourceMap);
-                queueMessage("cursor", p);
+                sock.send(cursorP(p, sourceMap));
             }
             break;
         case RIGHT:
             if (sourceMap.pos < sourceMap.text.length) {
                 var p = sourceMap.pos + 1;
-                cursorP(p, sourceMap);
-                queueMessage("cursor", p);
+                sock.send(cursorP(p, sourceMap));
             }
             break;
         default:
@@ -115,9 +100,8 @@ function attachToElementAsEditor(el) {
     document.addEventListener("keypress", function(e) {
         var charCode = e.which || e.keyCode;
         var c = String.fromCharCode(charCode);
-        insertT(c, sourceMap);
+        sock.send(insertT(c, sourceMap));
         drawInElement(el, sourceMap);
-        queueMessage("insert", c);
     });
 }
 
