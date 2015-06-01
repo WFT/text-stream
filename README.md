@@ -29,8 +29,8 @@ Once a WebSocket connection is opened to `/api/s/[SID]` (where `SID`
 is a valid socket ID), send `go` and begin mirroring all commands
 received.
 
-**NOTE:** Only _shared commands_ will be sent. The viewer never needs
-to worry about _stream author commands_.
+**NOTE:** Only *shared commands* will be sent. The viewer never needs
+to worry about *stream author commands*.
 
 **NOTE:** The commands received won't necessarily match the ones sent by
  the stream's author, but they should reproduce the same `source-map`
