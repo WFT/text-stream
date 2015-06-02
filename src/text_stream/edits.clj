@@ -1,5 +1,4 @@
-(ns text-stream.edits
-  (:require [hiccup.util :refer [escape-html]]))
+(ns text-stream.edits)
 
 (defn consolidate
   "Takes a seq of edits and composes them into a single function. Applies from
@@ -93,6 +92,8 @@
      ;; first message in a stream
      initial-text (fn [_ _] nil)
 
+     ;; we don't escape html here because the client does that and we
+     ;; want to be able to send literal characters to non-web-based viewers
      insert (fn [in _] (and (string? in) in))
 
      delete (fn [in source-map]
@@ -124,5 +125,5 @@
     (let [func (get commands cmd)
           text-input (subs text (inc cmd-len))]
       (if-let [valid-input ((get cmd-validators func)
-                            (escape-html text-input) source-map)]
+                            text-input source-map)]
         ((func valid-input) source-map)))))
