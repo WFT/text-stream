@@ -14,8 +14,6 @@ function attachToElementAsEditor(el) {
             var share = document.getElementById("share");
             share.href = "/s/" + p;
             share.innerText = "Share this stream!";
-            /*var status = document.getElementById("status");
-            status.innerText = "stream " + p + " connected! OK";*/
         }
     };
 
