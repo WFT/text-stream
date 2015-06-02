@@ -53,7 +53,7 @@
     (js-resource "utils.js")
     (js-resource "make-stream.js")]))
 
-(def page-count 25)
+(def page-count 15)
 
 (defn home [streams page]
   (page/html5
@@ -63,9 +63,13 @@
     [:a {:href "/new"} "New Stream"]
     [:h2 "Streams"]
     [:ul
-     (map (fn [x] [:li [:a {:href (str "/s/" (:id x))} (:title x)]])
-          ;;(take page-count (drop (* page-count page) streams))
-          streams)]]))
+     (for [x (take page-count (drop (* page-count page) streams))]
+       [:li [:a {:href (str "/s/" (:id x))} (:title x)]])]
+    (when (> page 0)
+      [:a#prev {:href (str "/?p=" (dec page))} "Previous "])
+    (when (and (not (<= (count streams) page-count))
+           (< (* page-count page) (/ (dec (count streams)) page-count)))
+      [:a#next {:href (str "/?p=" (inc page))} "Next"])]))
 
 (defn invalid-response
   [reason]

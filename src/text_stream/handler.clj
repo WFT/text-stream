@@ -1,6 +1,8 @@
 (ns text-stream.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
+            [ring.middleware.defaults :refer
+             [wrap-defaults site-defaults]]
             [text-stream.edits :as edits]
             [text-stream.templates :as templates]
             [aleph.http :as http]
@@ -118,17 +120,25 @@
                    (templates/invalid-response
                     "Request does not conform to text-stream protocol."))))))
 
+(defmacro if-let-int
+  ([n nsym then]
+   `(if-let-int ~n ~nsym ~then nil))
+  ([n nsym then else]
+   `(try
+      (let [~nsym (Integer/parseInt ~n)]
+        ~then)
+      (catch NumberFormatException e#
+        ~else))))
+
 (defmacro stream-id-route [route sid request & body]
   `(GET ~route [~'sid :as ~'request]
-        (try
-          (let [~'sid (Integer/parseInt ~'sid)]
-            (if (find-stream ~'sid)
-              (do ~@body)
-              (templates/invalid-response
-               "This stream doesn't exist!")))
-          (catch NumberFormatException e#
-            (templates/invalid-response
-               "This stream doesn't exist!")))))
+        (if-let-int ~'sid ~'sid
+                    (if (find-stream ~'sid)
+                      (do ~@body)
+                      (templates/invalid-response
+                       "This stream doesn't exist!"))
+                    (templates/invalid-response
+                     "This stream doesn't exist!"))))
 
 (defroutes app-routes
   (context "/api" []
@@ -147,13 +157,23 @@
    "/s/:sid" sid request
    (templates/response-default
     (templates/view-stream sid (:title (find-stream sid)))))
-  
+
+  (GET "/p" {{p :p} :params}
+       (if p
+         (templates/response-default (str p))
+         (templates/response-default "nope")))
   (GET "/new" [] (templates/new-stream))
-  (GET "/" []
-       (templates/home @streams 0))
+  (GET "/" {{p :p} :params}
+       (templates/response-default
+        (if-let-int
+         p page 
+         (templates/home @streams page)
+         (templates/home @streams 0))))
   (route/not-found "Not Found"))
 
 (defn -main [& args]
   (let [port (Integer/parseInt (or (first args) "8080"))]
     (println "Starting server on port" port)
-    (http/start-server #'app-routes {:port port})))
+    (http/start-server
+     (wrap-defaults #'app-routes site-defaults)
+     {:port port})))
