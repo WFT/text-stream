@@ -81,6 +81,9 @@
            reason])
    {:status 400}))
 
+;;; FIXME: This makes the whole thing work! Without it there are weird
+;;; errors regarding some handlers returning a Boolean. Usually when
+;;; a new viewer connects to the stream.
 (extend-protocol Renderable
   java.lang.Boolean
   (render [b _] {:status 200
