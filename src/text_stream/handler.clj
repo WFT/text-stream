@@ -121,24 +121,34 @@
                     "Request does not conform to text-stream protocol."))))))
 
 (defmacro if-let-int
-  ([n nsym then]
-   `(if-let-int ~n ~nsym ~then nil))
-  ([n nsym then else]
+  "Lets `bindings`, attempting to convert each string value to an Int,
+  followed by executing `then`.
+  If any of these conversions fails, executes `else`."
+  ([bindings then]
+   `(if-let-int ~bindings ~then nil))
+  ([bindings then else]
    `(try
-      (let [~nsym (Integer/parseInt ~n)]
+      (let ~(apply vector (map-indexed (fn [i x] (if (odd? i)
+                                     `(Integer/parseInt ~x)
+                                     x)) bindings))
         ~then)
       (catch NumberFormatException e#
         ~else))))
 
-(defmacro stream-id-route [route sid request & body]
-  `(GET ~route [~'sid :as ~'request]
-        (if-let-int ~'sid ~'sid
-                    (if (find-stream ~'sid)
-                      (do ~@body)
-                      (templates/invalid-response
-                       "This stream doesn't exist!"))
-                    (templates/invalid-response
-                     "This stream doesn't exist!"))))
+(defmacro stream-id-route 
+  "Creates GET route `route`, binding `request` to the request and
+  `sid` to a valid stream-id, otherwise returning a 404 with an appropriate
+  message."
+  [route sid request & body]
+  (let [bad-response#
+        (templates/invalid-response
+         "This stream doesn't exist!")]
+    `(GET ~route [~'sid :as ~'request]
+          (if-let-int [~'sid ~'sid]
+                      (if (find-stream ~'sid)
+                        (do ~@body)
+                        ~bad-response#)
+                      ~bad-response#))))
 
 (defroutes app-routes
   (context "/api" []
@@ -165,8 +175,7 @@
   (GET "/new" [] (templates/new-stream))
   (GET "/" {{p :p} :params}
        (templates/response-default
-        (if-let-int
-         p page 
+        (if-let-int [page p] 
          (templates/home @streams page)
          (templates/home @streams 0))))
   (route/not-found "Not Found"))
