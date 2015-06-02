@@ -16,7 +16,6 @@
     animation-duration: 0.9s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
-    
 }
 
 @-moz-keyframes blinker {  

@@ -34,7 +34,7 @@
    [:body
     [:a#share]
     [:pre#stream
-     [:span.cursor ""]]
+     [:span.cursor "Start Typing"]]
     (page/include-js "/utils.js" "/make-stream.js")]))
 
 (def page-count 15)

@@ -2,8 +2,8 @@
 
 function attachToElementAsEditor(el) {
     var sourceMap = {
-        pos:el.innerText.length,
-        text:el.innerText
+        pos:0,
+        text:""
     };
     
     var sock = new WebSocket(relativeURIWithPath("/api/new"));
@@ -82,7 +82,7 @@ function attachToElementAsEditor(el) {
         sock.send("inited:" + sourceMap.text);
         var title = prompt("Please title this stream:", "Untitled Stream");
         sock.send("titled:" + title);
-
+        document.title = "Streaming " + title;
         sock.onclose = function(e) {
             el.innerHTML += '<h3>CONNECTION CLOSED</h3>s';
             document.removeEventListener('keypress', onKeyPress);
