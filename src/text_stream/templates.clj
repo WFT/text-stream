@@ -32,9 +32,12 @@
     (page/include-css "/view-stream.css")
     [:title "Streaming..."]]
    [:body
-    [:a#share]
+    [:div#controls
+     [:a#share]
+     [:h1#title]
+     [:a#set-title {:href "#"} "Set Title"]]
     [:pre#stream
-     [:span.cursor "Start Typing"]]
+     [:span.cursor "Type Here"]]
     (page/include-js "/utils.js" "/make-stream.js")]))
 
 (def page-count 15)
