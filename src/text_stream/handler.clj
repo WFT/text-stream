@@ -3,6 +3,8 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer
              [wrap-defaults site-defaults]]
+            [ring.middleware.resource :refer
+             [wrap-resource]]
             [text-stream.edits :as edits]
             [text-stream.templates :as templates]
             [aleph.http :as http]
@@ -180,9 +182,15 @@
          (templates/home @streams 0))))
   (route/not-found "Not Found"))
 
+(def app
+  (-> #'app-routes
+      (wrap-defaults site-defaults)
+      (wrap-resource "/css")
+      (wrap-resource "/js")))
+
 (defn -main [& args]
   (let [port (Integer/parseInt (or (first args) "8080"))]
     (println "Starting server on port" port)
     (http/start-server
-     (wrap-defaults #'app-routes site-defaults)
+     #'app
      {:port port})))

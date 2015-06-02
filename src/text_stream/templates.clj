@@ -12,46 +12,30 @@
            :status 200
            :body body} options)))
 
-(defn resource-text
-  [directory]
-  (comp
-   slurp
-   io/file
-   io/resource
-   (partial str directory "/")))
-
-(def js-resource (comp javascript-tag (resource-text "js")))
-(defn css-resource
-  [css]
-  [:style
-   ((resource-text "css") css)])
-
 (defn view-stream
   [sid title]
   (page/html5
    [:head
     (javascript-tag (str "var sid = " sid ";"))
-    (css-resource "view-stream.css")
+    (page/include-css "/view-stream.css")
     [:title (str "Viewing " title)]]
    [:body
     [:h1 title]
     [:hr]
     [:pre#stream
      [:span.cursor "|"]]
-    (js-resource "utils.js")
-    (js-resource "view-stream.js")]))
+    (page/include-js "/utils.js" "/view-stream.js")]))
 
 (defn new-stream []
   (page/html5
    [:head
-    (css-resource "view-stream.css")
+    (page/include-css "/view-stream.css")
     [:title "Streaming..."]]
    [:body
     [:a#share]
     [:pre#stream
      [:span.cursor ""]]
-    (js-resource "utils.js")
-    (js-resource "make-stream.js")]))
+    (page/include-js "/utils.js" "/make-stream.js")]))
 
 (def page-count 15)
 
