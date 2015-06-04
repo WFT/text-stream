@@ -82,7 +82,7 @@ function attachToElementAsEditor(el) {
         document.title = "Streaming " + title;
         document.getElementById("title").innerText = title;
     }
-    document.getElementById("set-title").addEventListener("click", promptTitle);
+    document.getElementById("titleset").addEventListener("click", promptTitle);
     
     sock.onopen = function(e) {
         sock.send("inited:" + sourceMap.text);

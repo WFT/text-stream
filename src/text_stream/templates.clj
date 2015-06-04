@@ -20,10 +20,11 @@
     (page/include-css "/view-stream.css")
     [:title (str "Viewing " title)]]
    [:body
-    [:h1 title]
-    [:hr]
+    [:div#controls
+     [:ul
+      [:li [:h1#title title]]]]
     [:pre#stream
-     [:span.cursor "|"]]
+     [:span.cursor " "]]
     (page/include-js "/utils.js" "/view-stream.js")]))
 
 (defn new-stream []
@@ -33,9 +34,10 @@
     [:title "Streaming..."]]
    [:body
     [:div#controls
-     [:a#share]
-     [:h1#title]
-     [:a#set-title {:href "#"} "Set Title"]]
+     [:ul
+      [:li [:a#share]]
+      [:li [:h1#title "Untitled Stream"]]
+      [:li [:a#titleset {:href "#"} "Set Title"]]]]
     [:pre#stream
      [:span.cursor "Type Here"]]
     (page/include-js "/utils.js" "/make-stream.js")]))
