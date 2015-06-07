@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    font-family: monospace;
+}
+
+#controls {
+    background: black;
+    color: white;
+    text-align: center;
+    margin: 0;
+    opacity: .75;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+#controls>ul>li>a {
+    color: white;
+    font-size: 14px;
+}
+
+#controls>ul>li { display: inline; }
+
+#controls>ul {
+    list-style-type: none;
+    padding: 8px;
+}
+
+.left { float: left; }
+
+.right { float: right; }
+
+#title {
+    margin: 0;
+    padding: 8px;
+    display: inline-block;
+}
+
+.content {
+    margin-top: 6em;
+    padding: 8px;
+}

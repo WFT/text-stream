@@ -13,7 +13,7 @@ function attachToElementAsEditor(el) {
         if (e.data.substring(0, 6) == "cnnect" && p >= 0) {
             var share = document.getElementById("share");
             share.href = "/s/" + p;
-            share.innerText = "Share this stream!";
+            share.innerText = "Share";
         }
     };
 

@@ -17,48 +17,53 @@
   (page/html5
    [:head
     (javascript-tag (str "var sid = " sid ";"))
-    (page/include-css "/view-stream.css")
+    (page/include-css "/view-stream.css" "/main.css")
     [:title (str "Viewing " title)]]
    [:body
     [:div#controls
      [:ul
       [:li [:h1#title title]]]]
-    [:pre#stream
+    [:pre#stream.content
      [:span.cursor " "]]
     (page/include-js "/utils.js" "/view-stream.js")]))
 
 (defn new-stream []
   (page/html5
    [:head
-    (page/include-css "/view-stream.css")
+    (page/include-css "/view-stream.css" "/main.css")
     [:title "Streaming..."]]
    [:body
     [:div#controls
      [:ul
-      [:li [:a#share]]
+      [:li [:a#share.left]]
       [:li [:h1#title "Untitled Stream"]]
-      [:li [:a#titleset {:href "#"} "Set Title"]]]]
-    [:pre#stream
+      [:li [:a#titleset.right {:href "#"} "Set Title"]]]]
+    [:pre#stream.content
      [:span.cursor "Type Here"]]
-    (page/include-js "/utils.js" "/make-stream.js")]))
+    (page/include-js "/utils.js" "/make-stream.js")]))x
 
 (def page-count 15)
 
 (defn home [streams page]
   (page/html5
-   [:head [:title "text-stream"]]
+   [:head
+    (page/include-css "/main.css")
+    [:title "text-stream"]]
    [:body
-    [:h1 "text-stream"]
-    [:a {:href "/new"} "New Stream"]
-    [:h2 "Streams"]
-    [:ul
-     (for [x (take page-count (drop (* page-count page) streams))]
-       [:li [:a {:href (str "/s/" (:id x))} (:title x)]])]
-    (when (> page 0)
-      [:a#prev {:href (str "/?p=" (dec page))} "Previous "])
-    (when (and (not (<= (count streams) page-count))
-           (< (* page-count page) (/ (dec (count streams)) page-count)))
-      [:a#next {:href (str "/?p=" (inc page))} "Next"])]))
+    [:div#controls
+     [:ul
+      [:li [:h1#title "text-stream"]]
+      [:li [:a.right {:href "/new"} "New Stream"]]]]
+    [:div.content
+     [:h2 "Streams"]
+     [:ul
+      (for [x (take page-count (drop (* page-count page) streams))]
+        [:li [:a {:href (str "/s/" (:id x))} (:title x)]])]
+     (when (> page 0)
+       [:a#prev {:href (str "/?p=" (dec page))} "Previous "])
+     (when (and (not (<= (count streams) page-count))
+                (< (* page-count page) (/ (dec (count streams)) page-count)))
+       [:a#next {:href (str "/?p=" (inc page))} "Next"])]]))
 
 (defn invalid-response
   [reason]
