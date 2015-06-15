@@ -24,7 +24,7 @@
   "Produces an edit function which decrements cursor index by `n`."
   [n]
   (fn [source-map]
-    (update-in source-map [:pos] (partial - n))))
+    (update-in source-map [:pos] #(- % n))))
 
 (defn cursor-right
   "Produces an edit function which increments cursor index by `n`."
@@ -63,12 +63,6 @@
              {:pos new-position
               :text new-text}))))
 
-(defn titled
-  "Produces a titling function which sets the title to `title`."
-  [title]
-  (fn [source-map]
-    (assoc source-map :title title)))
-
 (defn forward-delete
   "Produces an edit function which deletes `deletion-count` characters from
   the text forwards from the current cursor position."
@@ -76,6 +70,12 @@
   #((delete deletion-count)
     ((cursor (+ deletion-count (:pos %)))
      %)))
+
+(defn titled
+  "Produces a titling function which sets the title to `title`."
+  [title]
+  (fn [source-map]
+    (assoc source-map :title title)))
 
 (defn initial-text
   "Produces a source-map which has the initial text `text`."
