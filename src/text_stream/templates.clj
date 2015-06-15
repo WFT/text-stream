@@ -22,7 +22,9 @@
    [:body
     [:div#controls
      [:ul
-      [:li [:h1#title title]]]]
+      [:li [:a#share.left {:href (str "/s/" sid)} "Share"]]
+      [:li [:h1#title title]]
+      [:li [:a.right {:href (str "/d/s/" sid)} "Download"]]]]
     [:pre#stream.content
      [:span.cursor " "]]
     (page/include-js "/utils.js" "/view-stream.js")]))
