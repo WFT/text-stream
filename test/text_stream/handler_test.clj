@@ -3,7 +3,7 @@
             [ring.mock.request :as mock]
             [text-stream.handler :refer :all]))
 
-(deftest test-app
+(deftest web-routes
   (testing "main route"
     (let [response (app (mock/request :get "/"))]
       (is (= (:status response) 200))))
