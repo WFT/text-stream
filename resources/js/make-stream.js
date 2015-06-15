@@ -39,14 +39,12 @@ function attachToElementAsEditor(el) {
             break;
         case LEFT:
             if (sourceMap.pos > 0) {
-                var p = sourceMap.pos - 1;
-                sock.send(cursorP(p, sourceMap));
+                sock.send(cursorL(1, sourceMap));
             }
             break;
         case RIGHT:
             if (sourceMap.pos < sourceMap.text.length) {
-                var p = sourceMap.pos + 1;
-                sock.send(cursorP(p, sourceMap));
+                sock.send(cursorR(1, sourceMap));
             }
             break;
         case DELETE:
