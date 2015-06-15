@@ -44,7 +44,7 @@
      [:span.cursor "Type Here"]]
     (page/include-js "/utils.js" "/make-stream.js")]))
 
-(def page-count 15)
+(def page-count "Number of streams per page." 15)
 
 (defn home [streams page]
   (page/html5

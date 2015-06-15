@@ -5,24 +5,35 @@ A simple one-way text streaming service.
 ## Protocol
 
 The streaming protocol is implemented over WebSockets.
-Every message consists of a command followed by a `:` followed
-by an argument: `command:argument`.
+Every message consists of a command followed by an argument or
+nothing simply the command, in which case the default argument will be
+used (if the command supports default arguments).
 
-### Shared Commands
+`<COMMAND><ARGUMENT>` i.e. `+Hello, world!` or `<`.
 
-`insert:TEXT` : Insert `TEXT` at the cursor position, moving the
-cursor to the end of the inserted text.
+### Shared (Editing) Commands
 
-`delete:N`    : Where `N` is a number which indicates the number of
-characters to delete (backwards) from the cursor.
+`+` : Insert argument at the cursor position, moving the
+cursor to the end of the inserted text. *No default argument*.
 
-`fwddel:N`    : Where `N` is a number which indicates the number of
-characters to delete (forwards) from the cursor.
+`-` : Where the argument `N` is a number which indicates the number of
+characters to delete (backwards) from the cursor. `N` defaults to `1`.
 
-`cursor:P`    : Where `P` is a number which indicates the index at
-which to place the cursor.
+`d` : Where the argument `N` is a number which indicates the number of
+characters to delete (forwards) from the cursor. `N` defaults to `1`.
 
-`titled:TITLE` : Set the title of this stream to `TITLE`.
+`c` : Where the argument `P` is a number which indicates the index at
+which to place the cursor. *No default argument*.
+
+`<` : Where the argument `N` is a number which indicates by how much
+the cursor position will be decremented (i.e. moved to the left). `N`
+defaults to `1`.
+
+`>` : Where the argument `N` is a number which indicates by how much
+the cursor position will be incremented (i.e. moved to the right). `N`
+defaults to `1`.
+
+`t` : Set the title of this stream to the argument. *No default argument*
 
 ### Viewer Commands
 Once a WebSocket connection is opened to `/api/s/[SID]` (where `SID`
@@ -38,13 +49,13 @@ to worry about *stream author commands*.
  a consequence of the above note, but other optimizations of received
  data may be applied.
 
-`go` : Sent to indicate that the viewer is ready to receive
-commands. This command has no arguments, and therefore no `:`.
+`go` : Sent by the viewer to indicate that it is ready to receive
+commands. This command has no arguments.
 
 ### Stream Author Commands
 
-`inited:TEXT`  : Set this text as the initial value of the
-stream. Equivalent to `insert:TEXT`, but only sent once, at the
+`i` : Set the argument `TEXT` as the initial value of the
+stream. Equivalent to `+TEXT`, but only sent once, at the
 beginning of the stream. This message *must* be sent before any other
 messages.
 
