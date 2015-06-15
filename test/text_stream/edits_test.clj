@@ -119,3 +119,16 @@
       (testing "out of bounds"
         (is (thrown? StringIndexOutOfBoundsException
                      ((forward-delete 1) source-map)))))))
+
+(deftest consolidation
+  (testing "consolidate"
+    (is (= ((consolidate
+             [(delete 3) (insert "abc") (cursor 0)])
+            (initial-text "hello"))
+           ((cursor 0) (initial-text "hello")))))
+
+  (testing "perform"
+    (is (= (perform
+            [(delete 3) (insert "abc") (cursor 0)]
+            (initial-text "hello"))
+           ((cursor 0) (initial-text "hello"))))))
