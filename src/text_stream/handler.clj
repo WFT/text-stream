@@ -56,11 +56,11 @@
                               (let [s (find-stream stream-id)]
                                 ;; Send existing nonsense
                                 (s/put! conn
-                                        (str "insert:"
+                                        (str "+"
                                              (:text s)))
 
                                 (s/put! conn
-                                        (str "cursor:"
+                                        (str "c"
                                              (:pos s)))
 
                                 (if (:closed s)
@@ -81,12 +81,12 @@
                 (templates/invalid-response
                  "Expected a WebSocket connection.")
 
-                ;; First message should be of the form "inited:<INITIAL TEXT>"
+                ;; First message should be of the form "i<INITIAL TEXT>"
                 (d/let-flow
                  [text (s/take! conn)]
-                 (if (and (>= (count text) 7)
-                          (= (subs text 0 7) "inited:"))
-                   (let [init-text (subs text 7)
+                 (if (and (>= (count text) edits/cmd-len)
+                          (= (subs text 0 edits/cmd-len) "i"))
+                   (let [init-text (subs text edits/cmd-len)
                          sid (add-stream init-text)]
                      
                      ;; Respond with `sid`

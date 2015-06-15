@@ -6,26 +6,42 @@ function attachToElement(el) {
     var sock = new WebSocket(relativeURIWithPath("/api/s/" + sid));
     sock.onmessage = function(e) {
         var cmd = e.data.substring(0, cmdLen);
-        var data = e.data.substring(cmdLen + 1);
+        var data = e.data.substring(cmdLen);
         switch (cmd) {
-        case "insert":
+        case "+":
             insertT(data, sourceMap);
             break;
-        case "delete":
+        case "-":
             var n = parseInt(data);
-            if (n) {
+            if (data === "") { n = 1; }
+            if (n > 0) {
                 deleteN(n, sourceMap);
             }
             break;
-        case "cursor":
+        case "c":
             var p = parseInt(data);
-            if (p >= 0) {
+            if (p >= 0 && p <= sourceMap.text.length) {
                 cursorP(p, sourceMap);
             }
             break;
-        case "fwddel":
+        case "<":
             var n = parseInt(data);
-            if (n) {
+            if (data === "") { n = 1; }
+            if (n <= pos) {
+                cursorL(n, sourceMap);
+            }
+            break;
+        case ">":
+            var n = parseInt(data);
+            if (data === "") { n = 1; }
+            if (sourceMap.pos + n <= sourceMap.text.length) {
+                cursorR(n, sourceMap);
+            }
+            break;
+        case "d":
+            var n = parseInt(data);
+            if (data === "") { n = 1; }
+            if (n > 0) {
                 fwdDeleteN(n, sourceMap);
             }
         }

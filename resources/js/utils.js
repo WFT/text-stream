@@ -3,23 +3,31 @@ function insertT(t, sourceMap) {
     var endText = sourceMap.text.substring(sourceMap.pos);
     sourceMap.text = beginText + t + endText;
     sourceMap.pos += t.length;
-    return "insert:"+t;
+    return "+"+t;
 }
 function deleteN(n, sourceMap) {
     sourceMap.pos -= n;
     var beginText = sourceMap.text.substring(0, sourceMap.pos);
     var endText = sourceMap.text.substring(sourceMap.pos + n);
     sourceMap.text = beginText + endText;
-    return "delete:"+n;
+    return "-"+n;
 }
 function fwdDeleteN(n, sourceMap) {
     cursorP(sourceMap.pos + n, sourceMap);
     deleteN(n, sourceMap);
-    return "fwddel:"+n;
+    return "d"+n;
 }
 function cursorP(p, sourceMap) {
     sourceMap.pos = p;
-    return "cursor:"+p;
+    return "c"+p;
+}
+function cursorL(n, sourceMap) {
+    sourceMap.pos -= n;
+    return n == 1 ? "<" : "<"+n;
+}
+function cursorR(n, sourceMap) {
+    sourceMap.pos += n;
+    return n == 1 ? ">" : ">"+n;
 }
 
 var curs = document.createElement('span');
@@ -34,7 +42,7 @@ function drawInElement(el, sourceMap) {
     el.appendChild(document.createTextNode(t.substring(sourceMap.pos + 1)));
 }
 
-var cmdLen = 6;
+var cmdLen = 1;
 
 function relativeURIWithPath(path) {
     var loc = window.location, new_uri;

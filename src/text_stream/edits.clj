@@ -20,6 +20,18 @@
   (fn [source-map]
     (assoc source-map :pos position-index)))
 
+(defn cursor-left
+  "Produces an edit function which decrements cursor index by `n`."
+  [n]
+  (fn [source-map]
+    (update-in source-map [:pos] (partial - n))))
+
+(defn cursor-right
+  "Produces an edit function which increments cursor index by `n`."
+  [n]
+  (fn [source-map]
+    (update-in source-map [:pos] (partial + n))))
+
 (defn insert
   "Produces an edit function which inserts `text-insertion` into the text at
   the current cursor position."
@@ -72,22 +84,26 @@
    {:pos 0 :text "" :title ""}))
 
 (def commands
-  "Note: all commands happen to be 6 characters. 
-  We'll exploit this later."
-  {"inited" initial-text
-   "insert" insert
-   "delete" delete
-   "cursor" cursor
-   "titled" titled
-   "fwddel" forward-delete})
+  "Note: all commands happen to be 1 character. 
+   This property is used to separate commands from arguments efficiently."
+  {"i" initial-text
+   "+" insert
+   "-" delete
+   "c" cursor
+   "<" cursor-left
+   ">" cursor-right
+   "t" titled
+   "d" forward-delete})
 
-(def cmd-len "Length of commands." 6)
+(def cmd-len "Length of commands." 1)
 
 (def cmd-validators
   "Functions which convert a string to fit type expected by command,
   or, if not possible, return `nil`."
   (let [parse-int #(try (Integer/parseInt (clojure.string/trim %))
-                       (catch NumberFormatException _ nil))]
+                        (catch NumberFormatException _ nil))
+        ;; parse-int-or-one defaults to 1 with arg ""
+        parse-int-or-one #(or (and (= (count %) 0) 1) (parse-int %))]
     {;; inited requires a different function, as it is only valid as the
      ;; first message in a stream
      initial-text (fn [_ _] nil)
@@ -97,23 +113,37 @@
      insert (fn [in _] (and (string? in) in))
 
      delete (fn [in source-map]
-              (if-let [n (parse-int in)]
+              (if-let [n (parse-int-or-one in)]
                 (and (<= n (:pos source-map)) n)))
 
      forward-delete (fn [in source-map]
-              (if-let [n (parse-int in)]
-                (and (< (:pos source-map) (count (:text source-map))) n)))
+                      (if-let [n (parse-int-or-one in)]
+                        (and (< (:pos source-map) (count (:text source-map))) n)))
 
      cursor (fn [in source-map]
+              ;; NOTE: cursor does NOT default to 1.
+              ;; It must always have an argument.
               (if-let [n (parse-int in)]
-                (and (<= n (count (:text source-map))) n)))
+                (and (<= n (count (:text source-map)))
+                     (>= n 0)
+                     n)))
 
+     cursor-left (fn [in source-map]
+                   (if-let [n (parse-int-or-one in)]
+                     (and (>= (:pos source-map) n) n)))
+
+     cursor-right (fn [in source-map]
+                    (if-let [n (parse-int-or-one in)]
+                      (and (<= (+ n (:pos source-map))
+                               (count (:text source-map)))
+                           n)))
+     
      titled (fn [in _] (and (string? in) in))}))
 
 (defn valid-command?
   "Is this a valid command? Returns the command string."
   [text]
-  (and (>= (count text) (inc cmd-len))
+  (and (>= (count text) cmd-len)
        (let [cmd (subs text 0 cmd-len)]
          (and
           (contains? commands cmd)
@@ -123,7 +153,7 @@
   [text source-map]
   (if-let [cmd (valid-command? text)]
     (let [func (get commands cmd)
-          text-input (subs text (inc cmd-len))]
+          text-input (subs text cmd-len)]
       (if-let [valid-input ((get cmd-validators func)
                             text-input source-map)]
         ((func valid-input) source-map)))))

@@ -78,17 +78,17 @@ function attachToElementAsEditor(el) {
 
     function promptTitle() {
         var title = prompt("Please title this stream:", "Untitled Stream");
-        sock.send("titled:" + title);
+        sock.send("t" + title);
         document.title = "Streaming " + title;
         document.getElementById("title").innerText = title;
     }
     document.getElementById("titleset").addEventListener("click", promptTitle);
     
     sock.onopen = function(e) {
-        sock.send("inited:" + sourceMap.text);
+        sock.send("i" + sourceMap.text);
         promptTitle();
         sock.onclose = function(e) {
-            el.innerHTML += '<h3>CONNECTION CLOSED</h3>s';
+            el.innerHTML += '<h3>CONNECTION CLOSED</h3>';
             document.removeEventListener('keypress', onKeyPress);
             document.removeEventListener('keydown', onKeyDown);
         };
