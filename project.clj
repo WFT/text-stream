@@ -12,7 +12,8 @@
                  [ring/ring-defaults "0.1.5"]
                  [aleph "0.4.0"]
                  [manifold "0.1.0"]
-                 [hiccup "1.0.5"]]
+                 [hiccup "1.0.5"]
+                 [korma "0.4.2"]]
   :main text-stream.handler
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
