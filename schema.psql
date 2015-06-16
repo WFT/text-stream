@@ -1,0 +1,1 @@
+CREATE TABLE streams (id bigserial primary key, title text, creation date, pos int, content text, closed bool);

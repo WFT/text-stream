@@ -37,7 +37,7 @@
   the current cursor position."
   [text-insertion]
   (fn [source-map]
-    (let [old-text (:text source-map)
+    (let [old-text (:content source-map)
           cursor (:pos source-map)
           new-text (str
                     (subs old-text 0 cursor)
@@ -46,14 +46,14 @@
           new-position (+ cursor (count text-insertion))]
       (merge source-map
              {:pos new-position
-              :text new-text}))))
+              :content new-text}))))
 
 (defn delete
   "Produces an edit function which deletes `deletion-count` characters from
   the text from the current cursor position (backwards)."
   [deletion-count]
   (fn [source-map]
-    (let [old-text (:text source-map)
+    (let [old-text (:content source-map)
           cursor (:pos source-map)
           new-position (- cursor deletion-count)
           new-text (str
@@ -61,7 +61,7 @@
                     (subs old-text cursor))]
       (merge source-map
              {:pos new-position
-              :text new-text}))))
+              :content new-text}))))
 
 (defn forward-delete
   "Produces an edit function which deletes `deletion-count` characters from
@@ -81,7 +81,7 @@
   "Produces a source-map which has the initial text `text`."
   [text]
   ((insert text)
-   {:pos 0 :text "" :title ""}))
+   {:pos 0 :content "" :title "" :closed false}))
 
 (def commands
   "Note: all commands happen to be 1 character. 
@@ -118,13 +118,13 @@
 
      forward-delete (fn [in source-map]
                       (if-let [n (parse-int-or-one in)]
-                        (and (< (:pos source-map) (count (:text source-map))) n)))
+                        (and (< (:pos source-map) (count (:content source-map))) n)))
 
      cursor (fn [in source-map]
               ;; NOTE: cursor does NOT default to 1.
               ;; It must always have an argument.
               (if-let [n (parse-int in)]
-                (and (<= n (count (:text source-map)))
+                (and (<= n (count (:content source-map)))
                      (>= n 0)
                      n)))
 
@@ -135,7 +135,7 @@
      cursor-right (fn [in source-map]
                     (if-let [n (parse-int-or-one in)]
                       (and (<= (+ n (:pos source-map))
-                               (count (:text source-map)))
+                               (count (:content source-map)))
                            n)))
      
      titled (fn [in _] (and (string? in) in))}))

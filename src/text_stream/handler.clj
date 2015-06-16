@@ -7,29 +7,12 @@
              [wrap-resource]]
             [text-stream.edits :as edits]
             [text-stream.templates :as templates]
+            [text-stream.data :as db]
             [aleph.http :as http]
             [manifold.stream :as s]
             [manifold.deferred :as d]
             [manifold.bus :as bus]))
 
-;;; The following is *very bad* *placeholder* code, to be replaced with an
-;;; actual database ASAP.
-(def streams (ref []))
-
-(defn find-stream [stream-id]
-  "Returns the stream with `stream-id`."
-  (and
-   (< stream-id (count @streams))
-   (let [stream (nth @streams stream-id)]
-     (and (not (:private stream))
-          stream))))
-
-(defn add-stream [text]
-  "Adds a stream with the `text` and returns its `stream-id`."
-  (dosync
-   (let [strid (count @streams)]
-     (alter streams conj (assoc (edits/initial-text text) :id strid))
-     strid)))
 
 (def streamrooms (bus/event-bus))
 
@@ -53,11 +36,11 @@
                                 (templates/invalid-response
                                  "First message must be 'go'."))
                               
-                              (let [s (find-stream stream-id)]
+                              (let [s (db/find-stream stream-id)]
                                 ;; Send existing nonsense
                                 (s/put! conn
                                         (str "+"
-                                             (:text s)))
+                                             (:content s)))
 
                                 (s/put! conn
                                         (str "c"
@@ -87,28 +70,27 @@
                  (if (and (>= (count text) edits/cmd-len)
                           (= (subs text 0 edits/cmd-len) "i"))
                    (let [init-text (subs text edits/cmd-len)
-                         sid (add-stream init-text)]
+                         sid (:id (db/add-stream init-text))]
                      
                      ;; Respond with `sid`
                      (s/put! conn (str "cnnect:" sid))
 
                      (s/consume
                       (fn [msg]
-                        (let [source-map (find-stream sid)]
+                        (let [source-map (db/find-stream sid)]
                           (when-let [new-map
                                      (edits/process-text-command msg source-map)]
                             (bus/publish! streamrooms sid msg)
-                            (dosync
-                             (alter streams assoc sid new-map)))
+                            (db/update-stream new-map))
                           (templates/response-default "PUBLISHED")))
                       conn)
                      
                      (s/on-closed
                       conn
                       (fn []
-                        (dosync
-                         (alter streams assoc sid
-                                (assoc (find-stream sid) :closed true)))
+                        (db/update-stream
+                         (assoc (db/find-stream sid) :closed true))
+
                         (doall
                          (map #(.close %)
                               ;; You don't have to go home, but you
@@ -147,7 +129,7 @@
          "This stream doesn't exist!")]
     `(GET ~route [~'sid :as ~'request]
           (if-let-int [~'sid ~'sid]
-                      (if (find-stream ~'sid)
+                      (if (db/find-stream ~'sid)
                         (do ~@body)
                         ~bad-response#)
                       ~bad-response#))))
@@ -162,13 +144,13 @@
   (stream-id-route
    "/d/s/:sid" sid request
    (templates/response-default
-    (:text (find-stream sid))
+    (:content (db/find-stream sid))
     {:content "text/plain"}))
 
   (stream-id-route
    "/s/:sid" sid request
    (templates/response-default
-    (templates/view-stream sid (:title (find-stream sid)))))
+    (templates/view-stream sid (:title (db/find-stream sid)))))
 
   (GET "/p" {{p :p} :params}
        (if p
@@ -178,8 +160,8 @@
   (GET "/" {{p :p} :params}
        (templates/response-default
         (if-let-int [page p] 
-         (templates/home @streams page)
-         (templates/home @streams 0))))
+         (templates/home page)
+         (templates/home 0))))
   (route/not-found "Not Found"))
 
 (def app

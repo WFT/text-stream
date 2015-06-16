@@ -1,5 +1,6 @@
 (ns text-stream.templates
-  (:require [hiccup.core :refer :all]
+  (:require [text-stream.data :as db]
+            [hiccup.core :refer :all]
             [hiccup.page :as page]
             [hiccup.element :refer :all]
             [clojure.java.io :as io]
@@ -46,7 +47,7 @@
 
 (def page-count "Number of streams per page." 15)
 
-(defn home [streams page]
+(defn home [page]
   (page/html5
    [:head
     (page/include-css "/main.css")
@@ -59,13 +60,12 @@
     [:div.content
      [:h2 "Streams"]
      [:ul
-      (for [x (take page-count (drop (* page-count page) streams))]
+      (for [x (db/get-stream-page page-count page)]
         [:li [:a {:href (str "/s/" (:id x))} (:title x)]])]
      (when (> page 0)
        [:a#prev {:href (str "/?p=" (dec page))} "Previous "])
-     (when (and (not (<= (count streams) page-count))
-                (< (* page-count page) (/ (dec (count streams)) page-count)))
-       [:a#next {:href (str "/?p=" (inc page))} "Next"])]]))
+     (when-not (db/last-page? page-count page)
+             [:a#next {:href (str "/?p=" (inc page))} "Next"])]]))
 
 (defn invalid-response
   [reason]

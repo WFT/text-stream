@@ -13,7 +13,9 @@
                  [aleph "0.4.0"]
                  [manifold "0.1.0"]
                  [hiccup "1.0.5"]
-                 [korma "0.4.2"]]
+                 [korma "0.4.2"]
+                 [org.clojure/java.jdbc "0.3.7"]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]]
   :main text-stream.handler
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]

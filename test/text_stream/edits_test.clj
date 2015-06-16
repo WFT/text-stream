@@ -7,7 +7,7 @@
     (let [text "Hello, world!"
           pos (count text)
           source-map (initial-text text)]
-      (is (= (:text source-map) text))
+      (is (= (:content source-map) text))
       (is (= (:pos source-map) pos)))))
 
 (deftest editing-functions
@@ -80,7 +80,7 @@
                       :correct
                       (merge %2
                              {:pos pos
-                              :text (str
+                              :content (str
                                      (subs text 0 pos)
                                      (subs text (:pos %2)))})}))
           end-tests (tests (inc (:pos source-map)) source-map)
