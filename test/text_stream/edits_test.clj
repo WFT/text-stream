@@ -132,3 +132,46 @@
             [(delete 3) (insert "abc") (cursor 0)]
             (initial-text "hello"))
            ((cursor 0) (initial-text "hello"))))))
+
+(deftest command-processing
+  (testing "command validity"
+    (is (= (valid-command? "+thisisastring") "+") "Insert string.")
+    (is (= (valid-command? "-3") "-") "Backspace.")
+    (is (= (valid-command? "<3") "<") "Left.")
+    (is (= (valid-command? ">3") ">") "Right.")
+    (is (= (valid-command? "iboop") "i") "Init.")
+    (is (= (valid-command? "c0") "c") "Cursor.")
+    (is (= (valid-command? "toop") "t") "Title.")
+    (is (= (valid-command? "d7") "d") "Forward delete.")
+    (testing "default arguments"
+      (is (= (valid-command? "-") "-") "Backspace.")
+      (is (= (valid-command? "<") "<") "Left.")
+      (is (= (valid-command? ">") ">") "Right.")
+      (is (= (valid-command? "d") "d") "Forward delete.")))
+
+  (testing "command processing"
+    (let [source-map ((cursor 4) (initial-text "hello there"))]
+      (is (= (process-text-command "+thisisastring" source-map)
+             ((insert "thisisastring") source-map))
+          "Insert string.")
+      (is (= (process-text-command "-3" source-map)
+             ((delete 3) source-map)) "Backspace.")
+      (is (= (process-text-command "<3" source-map)
+             ((cursor-left 3) source-map)) "Left.")
+      (is (= (process-text-command ">3" source-map)
+             ((cursor-right 3) source-map)) "Right.")
+      (is (= (process-text-command "c0" source-map)
+             ((cursor 0) source-map)) "Cursor.")
+      (is (= (process-text-command "toop" source-map)
+             ((titled "oop") source-map)) "Title.")
+      (is (= (process-text-command "d3" source-map)
+             ((forward-delete 3) source-map)) "Forward delete.")
+      (testing "default arguments"
+        (is (= (process-text-command "-" source-map)
+               ((delete 1) source-map)) "Backspace.")
+        (is (= (process-text-command "<" source-map)
+               ((cursor-left 1) source-map)) "Left.")
+        (is (= (process-text-command ">" source-map)
+               ((cursor-right 1) source-map)) "Right.")
+        (is (= (process-text-command "d" source-map)
+               ((forward-delete 1) source-map)) "Forward delete.")))))
