@@ -32,6 +32,7 @@
                             ;; (trim is to allow debug via wssh)
                             (if-not (= (clojure.string/trim ready) "go")
                               (do
+                                (s/put! conn "First message must be 'go'.")
                                 (s/close! conn)
                                 (templates/invalid-response
                                  "First message must be 'go'."))
@@ -49,7 +50,7 @@
                                 (if (:closed s)
                                   ;; Make sure we're not closed...
                                   (s/close! conn)
-                                  
+
                                   ;; Feed messages to clients
                                   (s/connect
                                    (bus/subscribe streamrooms stream-id)
@@ -80,8 +81,8 @@
                         (let [source-map (db/find-stream sid)]
                           (when-let [new-map
                                      (edits/process-text-command msg source-map)]
-                            (bus/publish! streamrooms sid msg)
-                            (db/update-stream new-map))
+                            (db/update-stream new-map)
+                            (bus/publish! streamrooms sid msg))
                           (templates/response-default "PUBLISHED")))
                       conn)
                      
@@ -104,16 +105,16 @@
                    (templates/invalid-response
                     "Request does not conform to text-stream protocol."))))))
 
-(defmacro if-let-int
+(defmacro if-let-long
   "Lets `bindings`, attempting to convert each string value to an Int,
   followed by executing `then`.
   If any of these conversions fails, executes `else`."
   ([bindings then]
-   `(if-let-int ~bindings ~then nil))
+   `(if-let-long ~bindings ~then nil))
   ([bindings then else]
    `(try
       (let ~(apply vector (map-indexed (fn [i x] (if (odd? i)
-                                     `(Integer/parseInt ~x)
+                                     `(Long/parseLong ~x)
                                      x)) bindings))
         ~then)
       (catch NumberFormatException e#
@@ -128,7 +129,7 @@
         (templates/invalid-response
          "This stream doesn't exist!")]
     `(GET ~route [~'sid :as ~'request]
-          (if-let-int [~'sid ~'sid]
+          (if-let-long [~'sid ~'sid]
                       (if (db/find-stream ~'sid)
                         (do ~@body)
                         ~bad-response#)
@@ -159,7 +160,7 @@
   (GET "/new" [] (templates/new-stream))
   (GET "/" {{p :p} :params}
        (templates/response-default
-        (if-let-int [page p] 
+        (if-let-long [page p] 
          (templates/home page)
          (templates/home 0))))
   (route/not-found "Not Found"))

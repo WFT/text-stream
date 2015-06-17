@@ -154,6 +154,6 @@
   (if-let [cmd (valid-command? text)]
     (let [func (get commands cmd)
           text-input (subs text cmd-len)]
-      (if-let [valid-input ((get cmd-validators func)
+      (when-let [valid-input ((get cmd-validators func)
                             text-input source-map)]
         ((func valid-input) source-map)))))
