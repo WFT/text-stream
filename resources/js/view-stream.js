@@ -27,7 +27,7 @@ function attachToElement(el) {
         case "<":
             var n = parseInt(data);
             if (data === "") { n = 1; }
-            if (n <= pos) {
+            if (n <= sourceMap.pos) {
                 cursorL(n, sourceMap);
             }
             break;
