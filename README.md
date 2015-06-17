@@ -2,6 +2,21 @@
 
 A simple one-way text streaming service.
 
+## Prerequisites
+
+You will need [Leiningen][] 2.0.0 or above installed.
+
+[leiningen]: https://github.com/technomancy/leiningen
+
+You will need [PostgreSQL][] 9.4.x.
+
+[postgresql]: http://www.postgresql.org
+
+## Running
+
+Just run `lein run [port]` (port will default to 8080). You'll need to run postgres. `text-stream` will use a database named `textstream`. The table creation command can be seen in `schema.psql`.
+
+
 ## Protocol
 
 The streaming protocol is implemented over WebSockets.
@@ -58,16 +73,6 @@ commands. This command has no arguments.
 stream. `iTEXT` is equivalent to `+TEXT`, but only sent once, at the
 beginning of the stream. This message *must* be sent before any other
 messages.
-
-## Prerequisites
-
-You will need [Leiningen][] 2.0.0 or above installed.
-
-[leiningen]: https://github.com/technomancy/leiningen
-
-## Running
-
-Just run `lein run [port]` (port will default to 8080). You'll need to run postgres. `text-stream` will use a database named `textstream`. The table creation command can be seen in `schema.psql`.
 
 ## License
 
