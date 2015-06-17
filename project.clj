@@ -15,7 +15,11 @@
                  [hiccup "1.0.5"]
                  [korma "0.4.2"]
                  [org.clojure/java.jdbc "0.3.7"]
-                 [org.postgresql/postgresql "9.4-1201-jdbc41"]]
+                 [org.postgresql/postgresql "9.4-1201-jdbc41"]
+                 [log4j "1.2.15" :exclusions [javax.mail/mail
+                                              javax.jms/jms
+                                              com.sun.jdmk/jmxtools
+                                              com.sun.jmx/jmxri]]]
   :main text-stream.handler
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
