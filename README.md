@@ -55,7 +55,7 @@ commands. This command has no arguments.
 ### Stream Author Commands
 
 `i` : Set the argument `TEXT` as the initial value of the
-stream. Equivalent to `+TEXT`, but only sent once, at the
+stream. `iTEXT` is equivalent to `+TEXT`, but only sent once, at the
 beginning of the stream. This message *must* be sent before any other
 messages.
 
@@ -67,7 +67,7 @@ You will need [Leiningen][] 2.0.0 or above installed.
 
 ## Running
 
-Just run `lein run [port]` (port will default to 8080).
+Just run `lein run [port]` (port will default to 8080). You'll need to run postgres. `text-stream` will use a database named `textstream`. The table creation command can be seen in `schema.psql`.
 
 ## License
 
