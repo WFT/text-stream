@@ -16,6 +16,10 @@ You will need [PostgreSQL][] 9.4.x.
 
 Just run `lein run [port]` (port will default to 8080). You'll need to run postgres. `text-stream` will use a database named `textstream`. The table creation command can be seen in `schema.psql`.
 
+## Tests
+
+Coverage is incomplete. `edits.clj` is covered.
+Run `lein test` to test.
 
 ## Protocol
 
