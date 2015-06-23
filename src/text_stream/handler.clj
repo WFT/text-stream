@@ -153,11 +153,8 @@
    (templates/response-default
     (templates/view-stream sid (:title (db/find-stream sid)))))
 
-  (GET "/p" {{p :p} :params}
-       (if p
-         (templates/response-default (str p))
-         (templates/response-default "nope")))
   (GET "/new" [] (templates/new-stream))
+
   (GET "/" {{p :p} :params}
        (templates/response-default
         (if-let-long [page p] 
